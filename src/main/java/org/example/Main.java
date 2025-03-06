@@ -21,7 +21,7 @@ public class Main {
             System.out.println("Press 3 for Display All Department ");
             System.out.println("Press 4 for Display Employees ");
             System.out.println("Press 5 for Display All Employees ");
-
+            System.out.println("Press 6 for Remove Department ");
 
             System.out.println("Enter your Choice ");
             int choice = sc.nextInt();
@@ -42,6 +42,8 @@ public class Main {
             {
                 Session session = sessionFactory.openSession();
                 Transaction transaction = session.beginTransaction();
+                displayDepartment(config,sessionFactory);
+
                 System.out.println("Enter the department number in which you want to add new employee ");
                 Department department = session.get(Department.class,sc.nextInt());
 
@@ -73,13 +75,7 @@ public class Main {
             }
             else if(choice == 3)
             {
-                Session session = sessionFactory.openSession();
-                List<Department> data = session.createQuery("from Department").getResultList();
-                for(Department item : data)
-                {
-                    System.out.println(item.getDno()+"\t"+item.getDname());
-                }
-                session.close();
+                displayDepartment(config,sessionFactory);
             }
             else if(choice == 4)
             {
@@ -99,13 +95,39 @@ public class Main {
                 Session session = sessionFactory.openSession();
                 List<Employee> data = session.createQuery("from Employee").getResultList();
 
+                System.out.println("SNO."+"\t"+"Name"+"\t"+"Age"+"\t"+"Salary"+"\t"+"Department");
+
                 for(Employee item : data)
                 {
-                    System.out.println(item.getSno()+"\t"+item.getName()+"\t"+item.getAge()+"\t"+item.getSalary()+"\t"+item.getDepartment().getDname());
+                    System.out.println(item.getSno()+"\t\t"+item.getName()+"\t"+item.getAge()+"\t"+item.getSalary()+"\t"+item.getDepartment().getDname());
                 }
 
                 session.close();
             }
+            else if(choice == 6)
+            {
+                Session session = sessionFactory.openSession();
+                Transaction transaction = session.beginTransaction();
+                displayDepartment(config,sessionFactory);
+                System.out.println("Enter Department number that you want to remove ");
+                Department department = session.get(Department.class,sc.nextInt());
+                session.remove(department);
+                transaction.commit();
+                System.out.println(department.getDname()+" is Removed!.....");
+                session.close();
+            }
         }
     }
+    public static void displayDepartment(Configuration config,SessionFactory sessionFactory)
+    {
+        Session session = sessionFactory.openSession();
+        List<Department> departmentList = session.createQuery("from Department").getResultList();
+
+        for(Department item : departmentList)
+        {
+            System.out.println(item.getDno()+"\t"+item.getDname());
+        }
+        session.close();
+    }
+
 }
