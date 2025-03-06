@@ -11,7 +11,7 @@ public class Department {
     private String dname;
 
     @OneToMany(cascade = CascadeType.ALL)
-    List<Employee> employees;
+   private List<Employee> employees;
 
     public Department() {
     }

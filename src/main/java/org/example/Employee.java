@@ -11,7 +11,7 @@ public class Employee {
     private int age,salary;
 
     @ManyToOne
-    Department department;
+   private Department department;
 
     public Employee() {
     }
