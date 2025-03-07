@@ -135,8 +135,14 @@ public class Main {
                 displayEmployees(employeeList);
                 System.out.println("Enter Employee SNO that you want to Remove ");
                 Employee employee = session.get(Employee.class,sc.nextInt());
-                session.remove(employee);
+                NativeQuery query = session.createNativeQuery("delete from employee where name=:name", Employee.class);
+                query.setParameter("name",employee.getName());
+                query.executeUpdate();
                 transaction.commit();
+//                System.out.println("Enter Employee SNO that you want to Remove ");
+//                Employee employee = session.get(Employee.class,sc.nextInt());
+//                session.remove(employee);
+//                transaction.commit();
                 System.out.println("Record Deleted!....");
                 session.close();
             }
@@ -158,5 +164,7 @@ public class Main {
             System.out.println(item.getDno()+"\t"+item.getDname());
         }
     }
+
+    //  ERROR: Cannot delete or update a parent row: a foreign key constraint fails (`mydata9`.`department_employee`, CONSTRAINT `FKjkkhgbwgr58mp4wt5jmpg7c8f` FOREIGN KEY
 
 }
