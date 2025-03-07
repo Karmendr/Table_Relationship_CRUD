@@ -6,6 +6,7 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.query.NativeQuery;
 
+import javax.persistence.NoResultException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -24,6 +25,7 @@ public class Main {
             System.out.println("Press 5 for Display All Employees ");
             System.out.println("Press 6 for Remove Department ");
             System.out.println("Press 7 for Remove Employee ");
+            System.out.println("Press 8 for Search Employee ");
 
             System.out.println("Enter your Choice ");
             int choice = sc.nextInt();
@@ -144,6 +146,22 @@ public class Main {
 //                session.remove(employee);
 //                transaction.commit();
                 System.out.println("Record Deleted!....");
+                session.close();
+            }
+            else if(choice == 8)
+            {
+                Session session = sessionFactory.openSession();
+                List<Employee> employeeList = session.createQuery("from Employee").getResultList();
+                displayEmployees(employeeList);
+                System.out.println("Enter Employee SNO that you want to search ");
+                try {
+                    Employee employee = session.get(Employee.class,sc.nextInt());
+                    System.out.println(employee.getSno()+"\t"+employee.getName()+"\t"+employee.getAge()+"\t"+employee.getSalary());
+                }
+                catch (NoResultException ob)
+                {
+                    System.out.println("No such Employee on that SNO ");
+                }
                 session.close();
             }
         }
