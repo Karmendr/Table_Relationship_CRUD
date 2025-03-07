@@ -158,9 +158,9 @@ public class Main {
                     Employee employee = session.get(Employee.class,sc.nextInt());
                     System.out.println(employee.getSno()+"\t"+employee.getName()+"\t"+employee.getAge()+"\t"+employee.getSalary());
                 }
-                catch (NoResultException ob)
+                catch (NullPointerException ob)
                 {
-                    System.out.println("No such Employee on that SNO ");
+                    System.out.println("No such Employee on that SNO \n");
                 }
                 session.close();
             }
