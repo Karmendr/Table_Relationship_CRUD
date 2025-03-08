@@ -7,6 +7,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.query.NativeQuery;
 
 import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -25,7 +26,13 @@ public class Main {
             System.out.println("Press 5 for Display All Employees ");
             System.out.println("Press 6 for Remove Department ");
             System.out.println("Press 7 for Remove Employee ");
-            System.out.println("Press 8 for Search Employee ");
+            System.out.println("Press 8 for Search Employee by SNO ");
+            System.out.println("Press 9 for Search Employee by Name ");
+            System.out.println("Press 10 for Search Department by dno ");
+            System.out.println("Press 11 for Search Department by Name ");
+            System.out.println("Press 12 for Update Department Information ");
+            System.out.println("Press 13 for Update Employee Information ");
+
 
             System.out.println("Enter your Choice ");
             int choice = sc.nextInt();
@@ -129,23 +136,16 @@ public class Main {
             {
                 Session session = sessionFactory.openSession();
                 Transaction transaction = session.beginTransaction();
-                List<Department> departmentList = session.createQuery("from Department").getResultList();
-                displayDepartment(departmentList);
-                System.out.println("Which department employee do you want to remove");
-                Department department = session.get(Department.class,sc.nextInt());
-                List<Employee> employeeList = department.getEmployees();
-                displayEmployees(employeeList);
                 System.out.println("Enter Employee SNO that you want to Remove ");
-                Employee employee = session.get(Employee.class,sc.nextInt());
-                NativeQuery query = session.createNativeQuery("delete from employee where name=:name", Employee.class);
-                query.setParameter("name",employee.getName());
+                int temp = sc.nextInt();
+                Employee employee = session.get(Employee.class,temp);
+                //session.createNativeQuery("delete from department_employee where employees_sno=:sno",Employee.class).setParameter("sno",temp).executeUpdate();
+                NativeQuery query = session.createNativeQuery("delete from department_employee where employees_sno=:sno", Employee.class);
+                query.setParameter("sno",temp);
                 query.executeUpdate();
+                session.remove(employee);
+                System.out.println(employee.getName()+" is Deleted!....");
                 transaction.commit();
-//                System.out.println("Enter Employee SNO that you want to Remove ");
-//                Employee employee = session.get(Employee.class,sc.nextInt());
-//                session.remove(employee);
-//                transaction.commit();
-                System.out.println("Record Deleted!....");
                 session.close();
             }
             else if(choice == 8)
@@ -162,6 +162,100 @@ public class Main {
                 {
                     System.out.println("No such Employee on that SNO \n");
                 }
+                session.close();
+            }
+            else if(choice == 9)
+            {
+                Session session = sessionFactory.openSession();
+                NativeQuery query = session.createNativeQuery("select * from employee where name=:name",Employee.class);
+                System.out.println("Enter Employee Name that you want to search ");
+                query.setParameter("name",sc.next());
+                try {
+                    Employee employee = (Employee) query.getSingleResult();
+                    System.out.println(employee.getSno()+"\t"+employee.getName()+"\t"+employee.getAge()+"\t"+employee.getSalary());
+                }
+                catch (NonUniqueResultException ob)
+                {
+                    List<Employee> employeeList = query.getResultList();
+                    displayEmployees(employeeList);
+                }
+                catch (NoResultException ob)
+                {
+                    System.out.println("No such Employee ");
+                }
+
+                session.close();
+            }
+            else if(choice == 10)
+            {
+                Session session = sessionFactory.openSession();
+                System.out.println("Enter Department number that you want to Search ");
+                Department department = session.get(Department.class,sc.nextInt());
+                if(department == null)
+                {
+                    System.out.println("No such Department on that Number ");
+                }
+                else
+                {
+                    System.out.println(department.getDno()+"\t"+department.getDname());
+                }
+
+                session.close();
+            }
+            else if(choice == 11)
+            {
+                Session session = sessionFactory.openSession();
+                System.out.println("Enter Department Name that you want to search ");
+                NativeQuery query = session.createNativeQuery("select * from department where dname=:name", Department.class);
+                query.setParameter("name",sc.next());
+                Department department = (Department) query.getSingleResult();
+                if(department == null)
+                {
+                    System.out.println("No such Department on that Number ");
+                }
+                else
+                {
+                    System.out.println(department.getDno()+"\t"+department.getDname());
+                }
+                session.close();
+            }
+            else if(choice == 12)
+            {
+                Session session = sessionFactory.openSession();
+                Transaction transaction = session.beginTransaction();
+                List<Department> departmentList = session.createQuery("from Department").getResultList();
+                displayDepartment(departmentList);
+                System.out.println("Enter Department number that you want to Update ");
+                int temp = sc.nextInt();
+                NativeQuery query = session.createNativeQuery("update department set dname=:name where dno=:dno", Department.class);
+                System.out.println("Enter new Department name ");
+                query.setParameter("name",sc.next());
+                query.setParameter("dno",temp);
+                query.executeUpdate();
+                transaction.commit();
+                System.out.println("Department Updated!.....");
+                session.close();
+            }
+
+            else if(choice == 13)
+            {
+                Session session = sessionFactory.openSession();
+                Transaction transaction = session.beginTransaction();
+                List<Employee> employeeList = session.createQuery("from Employee").getResultList();
+                displayEmployees(employeeList);
+                System.out.println("Enter Employee SNO that you want to Update ");
+                int sno = sc.nextInt();
+                NativeQuery query = session.createNativeQuery("update employee set name=:name,age=:age,salary=:salary where sno=:sno", Employee.class);
+                System.out.println("Enter new Name ");
+                query.setParameter("name",sc.next());
+                System.out.println("Enter new Age ");
+                query.setParameter("age",sc.nextInt());
+                System.out.println("Enter new Salary ");
+                query.setParameter("salary",sc.nextInt());
+                query.setParameter("sno",sno);
+                query.executeUpdate();
+                transaction.commit();
+                System.out.println("Record Updated!......");
                 session.close();
             }
         }
@@ -182,7 +276,5 @@ public class Main {
             System.out.println(item.getDno()+"\t"+item.getDname());
         }
     }
-
-    //  ERROR: Cannot delete or update a parent row: a foreign key constraint fails (`mydata9`.`department_employee`, CONSTRAINT `FKjkkhgbwgr58mp4wt5jmpg7c8f` FOREIGN KEY
 
 }
